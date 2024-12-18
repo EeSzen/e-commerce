@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -8,18 +8,10 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Chip from "@mui/material/Chip";
 
-
-// const bull = (
-//   <Box
-//     component="span"
-//     sx={{ display: "inline-block", mx: "2px", transform: "scale(0.8)" }}
-//   >
-//     •
-//   </Box>
-// );
+// import { deleteProducts } from "../../utility/api";
 
 function GameCard(props) {
-  const { item } = props;
+  const { item, onDelete } = props;
   const { _id, name, price, description, category } = item;
 
   return (
@@ -65,6 +57,8 @@ function GameCard(props) {
         <Button
           variant="contained"
           size="small"
+          LinkComponent={Link}
+          to={`/products/${item._id}/edit`}
           sx={{ borderRadius: 30, ml: 1 }}
         >
           Edit
@@ -74,6 +68,9 @@ function GameCard(props) {
           size="small"
           color="error"
           sx={{ borderRadius: 30, mr: 1 }}
+          onClick={() => {
+            onDelete(_id);
+          }}
         >
           Delete
         </Button>

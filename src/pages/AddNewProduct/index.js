@@ -1,24 +1,40 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Container, Typography, Box, TextField, Button } from "@mui/material";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Header from "../../components/Header";
 import { toast } from "sonner";
+import { addNewProducts } from "../../utility/api";
 
 function AddNewProduct() {
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(0);
   const [category, setCategory] = useState("");
 
-  const handleFormSubmit = (event) => {
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
     //check for error
     if (!name || !price || !category) {
       toast.error("Please fill out all the required fields");
     }
 
-    //trigger the api
+    //trigger the add new product API
+    const newProductData = await addNewProducts(
+      name,
+      description,
+      price,
+      category
+    );
+
+    // check if the newProductData exist or not
+    if (newProductData) {
+      // show success error
+      toast.success("Product has been added successfully");
+      navigate("/");
+    }
   };
 
   return (

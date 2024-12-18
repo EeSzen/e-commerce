@@ -7,13 +7,13 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import { toast } from "sonner";
 
-// import Dropdown from "../../components/Dropdown";
 import Header from "../../components/Header";
 import GameCard from "../../components/Card";
 import Container from "@mui/material/Container";
 
-import { getProducts, getCategory } from "../../utility/api";
+import { getProducts, getCategory, deleteProducts } from "../../utility/api";
 import { ArrowLeft, ArrowRight } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
@@ -44,6 +44,25 @@ function Home() {
     setCategory(event.target.value);
     // reset the page back to page 1
     setPage(1);
+  };
+
+  const handleDelete = async (id) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this product?"
+    );
+    if (confirmed) {
+      const deleted = await deleteProducts(id);
+      if (deleted) {
+        // get the latest products data from the API again
+        const latestProducts = await getProducts(category, page);
+        // update the products state with the latest data
+        setList(latestProducts);
+        // show success message
+        toast.success("Product deleted successfully");
+      } else {
+        toast.error("Failed to delete product");
+      }
+    }
   };
 
   return (
@@ -101,7 +120,10 @@ function Home() {
             {list.length > 0 ? (
               list.map((item) => (
                 <Grid key={item._id} xs={12} md={6} lg={4}>
-                  <GameCard item={item} />
+                  <GameCard
+                    item={item}
+                    onDelete={() => handleDelete(item._id)}
+                  />
                 </Grid>
               ))
             ) : (
