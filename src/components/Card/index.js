@@ -34,6 +34,7 @@ function GameCard(props) {
       toast.success("Product added successfully");
       // existingProduct.quantity = existingProduct.quantity + 1;
     } else {
+      toast.success("Product added successfully");
       products.push({
         _id: _id,
         name: name,
@@ -48,7 +49,7 @@ function GameCard(props) {
 
     localStorage.setItem("products", convertedProducts);
     // 3. redirect back to /addtocart
-    navigate("/products/cart");
+    // navigate("/products/cart");
   };
 
   return (
