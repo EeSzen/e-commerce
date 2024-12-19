@@ -7,6 +7,8 @@ import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Chip from "@mui/material/Chip";
+import { toast } from "sonner";
+
 
 function GameCard(props) {
   const { item, onDelete } = props;
@@ -29,6 +31,7 @@ function GameCard(props) {
 
     if (existingProduct) {
       existingProduct.quantity += 1;
+      toast.success("Product added successfully");
       // existingProduct.quantity = existingProduct.quantity + 1;
     } else {
       products.push({
