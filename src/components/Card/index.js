@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -8,11 +8,45 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Chip from "@mui/material/Chip";
 
-// import { deleteProducts } from "../../utility/api";
-
 function GameCard(props) {
   const { item, onDelete } = props;
   const { _id, name, price, description, category } = item;
+  const navigate = useNavigate();
+
+  const handleCartAdd = (event) => {
+    event.preventDefault();
+    // localstorage
+    const stringProducts = localStorage.getItem("products");
+    // convert the string version of Products into array
+    let products = JSON.parse(stringProducts);
+
+    // if Products is not found, set it as empty array
+    if (!products) {
+      products = [];
+    }
+
+    const existingProduct = products.find((product) => product._id === _id);
+
+    if (existingProduct) {
+      existingProduct.quantity += 1;
+      // existingProduct.quantity = existingProduct.quantity + 1;
+    } else {
+      products.push({
+        _id: _id,
+        name: name,
+        price: price,
+        description: description,
+        category: category,
+        quantity: 1,
+      });
+    }
+
+    let convertedProducts = JSON.stringify(products);
+
+    localStorage.setItem("products", convertedProducts);
+    // 3. redirect back to /addtocart
+    navigate("/products/cart");
+  };
 
   return (
     <Card sx={{ minWidth: 200 }}>
@@ -43,7 +77,7 @@ function GameCard(props) {
             sx={{ backgroundColor: "lightpink" }}
           />
         </Box>
-        <Button variant="contained" fullWidth>
+        <Button variant="contained" fullWidth onClick={handleCartAdd}>
           Add To Cart
         </Button>
       </CardContent>

@@ -53,7 +53,7 @@ function EditProduct() {
   return (
     <>
       <Container>
-        <Header />
+        <Header label="Edit" />
         <Card>
           <CardContent>
             <Typography variant="h4" align="center" mb={4}>

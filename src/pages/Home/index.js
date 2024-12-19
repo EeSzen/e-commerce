@@ -141,13 +141,6 @@ function Home() {
                 </Box>
               </Grid>
             )}
-            {/* {list.forEach((item) => {
-              console.log(item._id)
-              return (
-              <Grid key={item._id} xs={12} md={4} >
-                <GameCard item={item} />
-              </Grid>
-            )})} */}
           </Grid>
         </Box>
         <Box

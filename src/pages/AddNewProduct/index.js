@@ -39,7 +39,7 @@ function AddNewProduct() {
 
   return (
     <Container>
-      <Header />
+      <Header label="Add New" />
       <Card>
         <CardContent>
           <Typography variant="h4" align="center">
