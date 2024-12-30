@@ -7,8 +7,9 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Box, Button, Container } from "@mui/material";
+import { Button, Container } from "@mui/material";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 import Header from "../../components/Header";
 
@@ -151,7 +152,17 @@ function AddToCart() {
             </TableRow>
             <TableRow>
               <TableCell colSpan={5} align="right">
-                <Button variant="contained">Checkout</Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  LinkComponent={Link}
+                  to="/checkout"
+                  sx={{ textTransform: "none" }}
+                  disabled={products.length === 0 ? true : false}
+                >
+                  Checkout
+                </Button>
               </TableCell>
             </TableRow>
           </TableBody>

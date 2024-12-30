@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Typography, Box, Container } from "@mui/material";
 import { Button } from "@mui/material";
@@ -11,6 +10,7 @@ function Header(props) {
 
   const isHomePage = location.pathname === "/";
   const isCartPage = location.pathname === "/products/cart";
+  const isOrdersPage = location.pathname === "/orders";
 
   return (
     <Box
@@ -51,6 +51,7 @@ function Header(props) {
         </Button>
         <Button
           variant="contained"
+          sx={{ mr: 1 }}
           disabled={isCartPage}
           // Disable if we're already on the homepage
           onClick={() => {
@@ -58,6 +59,16 @@ function Header(props) {
           }}
         >
           Cart
+        </Button>
+        <Button
+          variant="contained"
+          disabled={isOrdersPage}
+          // Disable if we're already on the homepage
+          onClick={() => {
+            navigate("/orders");
+          }}
+        >
+          Orders
         </Button>
       </Container>
     </Box>
