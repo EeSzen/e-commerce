@@ -1,5 +1,5 @@
 import { Button, Container, Paper } from "@mui/material";
-import { authSignup } from "../../utility/api";
+import { authSignup, validateEmail } from "../../utility/api";
 import { useState } from "react";
 import Header from "../../components/Header";
 import TextField from "@mui/material/TextField";
@@ -19,17 +19,19 @@ function Signup() {
     if (!name || !email || !password || !confirm) {
       return toast.error("Please fill out all the required fields");
     }
-    if(confirm !== password){
-        return toast.error("Please check your password");
-    }
 
-    
+    if (confirm !== password) {
+      return toast.error("Please check your password");
+    } 
+
     //trigger the add new product API
     const newUser = await authSignup(name, email, password, confirm);
-    
+
     // check if the newUser exist or not
     if (!newUser) {
       return toast.error("Email or Password is incorrect");
+    }else if (!validateEmail) {
+      return toast.error("Email already exists");
     }
 
     if (newUser) {
