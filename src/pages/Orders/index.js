@@ -48,21 +48,28 @@ function Orders() {
     }
   };
 
-  const handleStatusChange = async (_id, newStatus) => {
-    try {
-      const updatedOrder = await updateOrder(_id, newStatus);
-      if (updatedOrder) {
-        // Update the order in the state with the new status
-        setOrder((prevOrders) =>
-          prevOrders.map((order) =>
-            order._id === _id ? { ...order, status: newStatus } : order
-          )
-        );
-        toast.success("Order status updated successfully");
-        console.log(handleStatusChange)
-      }
-    } catch (error) {
-      toast.error("Failed to update order status");
+  const handleStatusChange = async (_id, status) => {
+    // try {
+    //   const updatedOrder = await updateOrder(_id, newStatus);
+    //   if (updatedOrder) {
+    //     // Update the order in the state with the new status
+    //     setOrder((prevOrders) =>
+    //       prevOrders.map((order) =>
+    //         order._id === _id ? { ...order, status: newStatus } : order
+    //       )
+    //     );
+    //     toast.success("Order status updated successfully");
+    //     console.log(handleStatusChange)
+    //   }
+    // } catch (error) {
+    //   toast.error("Failed to update order status");
+    // }
+    const updatedOrder = await updateOrder(_id, status);
+    if (updatedOrder) {
+      // fetch the updated orders from API
+      const updatedOrders = await getOrders();
+      setOrder(updatedOrders);
+      toast.success("Order status has been updated");
     }
   };
 
@@ -74,11 +81,46 @@ function Orders() {
           <TableHead>
             <TableRow>
               <TableCell>Customer </TableCell>
-              <TableCell align="right">Products</TableCell>
-              <TableCell align="right">Total Amount</TableCell>
-              <TableCell align="right">Status</TableCell>
-              <TableCell align="right">Payment Date</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell
+                align="right"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
+                Products
+              </TableCell>
+              <TableCell
+                align="right"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
+                Total Amount
+              </TableCell>
+              <TableCell
+                align="right"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
+                Status
+              </TableCell>
+              <TableCell
+                align="right"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
+                Payment Date
+              </TableCell>
+              <TableCell
+                align="right"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -93,7 +135,7 @@ function Orders() {
                 </TableCell>
                 <TableCell align="right">
                   {item.products.map((a) => (
-                    <div>{a.name}</div>
+                    <div key={a._id}>{a.name}</div>
                   ))}
                 </TableCell>
                 <TableCell align="right">
@@ -102,16 +144,22 @@ function Orders() {
                 {/* ======= dropdown ====== */}
                 <TableCell align="right">
                   <FormControl>
-                    <Select
-                      value={item.status}
-                      onChange={(e) =>
-                        handleStatusChange(item._id, e.target.value)
-                      }
-                    >
-                      <MenuItem value="pending">Pending</MenuItem>
-                      <MenuItem value="paid">Paid</MenuItem>
-                      <MenuItem value="failed">Failed</MenuItem>
-                    </Select>
+                    {item.status === "pending" ? (
+                      <Select value={item.status} disabled={true}>
+                        <MenuItem value="pending">Pending</MenuItem>
+                      </Select>
+                    ) : (
+                      <Select
+                        value={item.status}
+                        onChange={(event) => {
+                          handleStatusChange(item._id, event.target.value);
+                        }}
+                      >
+                        <MenuItem value="paid">Paid</MenuItem>
+                        <MenuItem value="failed">Failed</MenuItem>
+                        <MenuItem value="completed">Completed</MenuItem>
+                      </Select>
+                    )}
                   </FormControl>
                 </TableCell>
                 {/* ====================== */}

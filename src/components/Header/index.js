@@ -11,6 +11,8 @@ function Header(props) {
   const isHomePage = location.pathname === "/";
   const isCartPage = location.pathname === "/products/cart";
   const isOrdersPage = location.pathname === "/orders";
+  const isLoginPage = location.pathname === "/login";
+  const isSignupPage = location.pathname === "/signup";
 
   return (
     <Box
@@ -62,6 +64,7 @@ function Header(props) {
         </Button>
         <Button
           variant="contained"
+          sx={{ mr: 1 }}
           disabled={isOrdersPage}
           // Disable if we're already on the homepage
           onClick={() => {
@@ -69,6 +72,28 @@ function Header(props) {
           }}
         >
           Orders
+        </Button>
+        <Button
+          variant="contained"
+          sx={{ mr: 1 }}
+          disabled={isLoginPage}
+          // Disable if we're already on the homepage
+          onClick={() => {
+            navigate("/login");
+          }}
+        >
+          Login
+        </Button>
+        <Button
+          variant="contained"
+          sx={{ mr: 1 }}
+          disabled={isSignupPage}
+          // Disable if we're already on the homepage
+          onClick={() => {
+            navigate("/signup");
+          }}
+        >
+          Sign Up
         </Button>
       </Container>
     </Box>

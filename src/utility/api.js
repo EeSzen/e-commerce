@@ -241,3 +241,31 @@ export const validateEmail = (email) => {
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
 };
+
+// ======== Auth ======== //
+// login
+export const authLogin = async (email , password) => {
+  try {
+    const response = await axios.post(API_URL + "/auth/login", {
+      email,
+      password,
+    });
+    return response.data;
+  } catch (error) {
+    toast.error(error.message);
+  }
+};
+
+// Signup
+export const authSignup = async (name, email, password) => {
+  try {
+    const response = await axios.post(API_URL + "/auth/signup", {
+      name,
+      email,
+      password,
+    });
+    return response.data;
+  } catch (error) {
+    toast.error(error.message);
+  }
+};
