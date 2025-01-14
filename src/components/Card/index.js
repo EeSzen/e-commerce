@@ -70,7 +70,11 @@ function GameCard(props) {
   return (
     <Card sx={{ minWidth: 200 }}>
       {item.image !== "" ? (
-        <CardMedia component="img" image={`${API_URL}/${item.image}`} />
+        <CardMedia
+          component="img"
+          image={`${API_URL}/${item.image}`}
+          sx={{ maxHeight: "200px", minHeight: "200px" }}
+        />
       ) : null}
       <CardContent>
         <Typography variant="h5" component="div">
