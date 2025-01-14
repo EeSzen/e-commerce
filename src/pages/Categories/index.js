@@ -108,7 +108,12 @@ function Categories() {
           />
         </>
         <>
-          <Button variant="contained" size="large" sx={{ml:2}} onClick={handleFormSubmit}>
+          <Button
+            variant="contained"
+            size="large"
+            sx={{ ml: 2 }}
+            onClick={handleFormSubmit}
+          >
             Add
           </Button>
         </>

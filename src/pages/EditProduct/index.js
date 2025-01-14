@@ -17,7 +17,7 @@ import {
   getProduct,
   getUserToken,
   getCategory,
-  isAdmin
+  isAdmin,
 } from "../../utility/api";
 import { useCookies } from "react-cookie";
 import ButtonUpload from "../../components/ButtonUpload";
@@ -44,6 +44,7 @@ function EditProduct() {
       setDescription(productData.description);
       setPrice(productData.price);
       setCategory(productData.category);
+      setImage(productData.image_url);
     });
   }, [id]);
 
@@ -103,36 +104,37 @@ function EditProduct() {
               Edit Product
             </Typography>
           </CardContent>
-          <Box mb={2}>
-            <TextField
-              label="Name"
-              required
-              fullWidth
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-            />
-          </Box>
-          <Box mb={2}>
-            <TextField
-              label="Description"
-              required
-              fullWidth
-              value={description}
-              onChange={(event) => setDescription(event.target.value)}
-            />
-          </Box>
-          <Box mb={2}>
-            <TextField
-              label="Price"
-              required
-              fullWidth
-              type="number"
-              value={price}
-              onChange={(event) => setPrice(event.target.value)}
-            />
-          </Box>
-          {/* text box */}
-          {/* <Box mb={2}>
+          <Container>
+            <Box mb={2}>
+              <TextField
+                label="Name"
+                required
+                fullWidth
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+              />
+            </Box>
+            <Box mb={2}>
+              <TextField
+                label="Description"
+                required
+                fullWidth
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+              />
+            </Box>
+            <Box mb={2}>
+              <TextField
+                label="Price"
+                required
+                fullWidth
+                type="number"
+                value={price}
+                onChange={(event) => setPrice(event.target.value)}
+              />
+            </Box>
+            {/* text box */}
+            {/* <Box mb={2}>
             <TextField
               label="Category"
               required
@@ -141,66 +143,70 @@ function EditProduct() {
               onChange={(event) => setCategory(event.target.value)}
             />
           </Box> */}
-          {/* text box */}
-          <Box>
-            <FormControl variant="filled" style={{ minWidth: 220 }}>
-              <InputLabel id="demo-simple-select-filled-label">
-                All Categories
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-filled-label"
-                id="demo-simple-select-filled"
-                value={category}
-                onChange={handleChange}
-              >
-                <MenuItem value="">
-                  <em>All</em>
-                </MenuItem>
-                {categories.map((item) => (
-                  <MenuItem value={item._id}>{item.name}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
+            {/* text box */}
+            <Box>
+              <FormControl variant="filled" style={{ minWidth: 220 }}>
+                <InputLabel id="demo-simple-select-filled-label">
+                  All Categories
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-filled-label"
+                  id="demo-simple-select-filled"
+                  value={category}
+                  onChange={handleChange}
+                  sx={{ my: 2 }}
+                >
+                  <MenuItem value="">
+                    <em>All</em>
+                  </MenuItem>
+                  {categories.map((item) => (
+                    <MenuItem value={item._id}>{item.name}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
 
-          {image !== "" ? (
-            <>
-              <div>
-                <img
-                  src={`${API_URL}/${image}`}
-                  style={{
-                    width: "100%",
-                    maxWidth: "300px",
-                  }}
-                />
-              </div>
-              <Button
-                onClick={() => setImage("")}
-                variant="contained"
-                color="error"
-              >
-                Remove
-              </Button>
-            </>
-          ) : (
-            <ButtonUpload
-              onFileUpload={(files) => {
-                console.log(files);
-                // trigger the upload api
-                if (files && files[0]) {
-                  handleImageUpload(files);
-                }
-              }}
-            />
-          )}
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={handleFormSubmit}
-          >
-            Update
-          </Button>
+            {image !== "" ? (
+              <>
+                <div>
+                  <img
+                    src={`${API_URL}/${image}`}
+                    style={{
+                      width: "100%",
+                      maxWidth: "300px",
+                    }}
+                  />
+                </div>
+                <Button
+                  onClick={() => setImage("")}
+                  variant="contained"
+                  color="error"
+                  sx={{ my: 1 }}
+                >
+                  Remove
+                </Button>
+              </>
+            ) : (
+              <ButtonUpload
+                onFileUpload={(files) => {
+                  console.log(files);
+                  // trigger the upload api
+                  if (files && files[0]) {
+                    handleImageUpload(files);
+                  }
+                }}
+              />
+            )}
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={handleFormSubmit}
+              sx={{ my: 3 }}
+            >
+              Update
+            </Button>
+          </Container>
         </Card>
       </Container>
       <Backdrop
