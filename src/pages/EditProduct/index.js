@@ -17,6 +17,7 @@ import {
   getProduct,
   getUserToken,
   getCategory,
+  isAdmin
 } from "../../utility/api";
 import { useCookies } from "react-cookie";
 import ButtonUpload from "../../components/ButtonUpload";
@@ -55,6 +56,13 @@ function EditProduct() {
   const handleChange = (event) => {
     setCategory(event.target.value);
   };
+
+  // check if is admin or not
+  useEffect(() => {
+    if (!isAdmin(cookies)) {
+      navigate("/login");
+    }
+  }, [cookies, navigate]);
 
   const handleImageUpload = async (files) => {
     // trigger the upload API
