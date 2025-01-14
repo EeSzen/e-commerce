@@ -2,58 +2,76 @@ import { Link, useNavigate } from "react-router-dom";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
+import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
+import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Chip from "@mui/material/Chip";
 import { toast } from "sonner";
+import { useCookies } from "react-cookie";
+import { isAdmin, isUserLoggedIn } from "../../utility/api";
 
+const API_URL = "http://localhost:5555";
 
 function GameCard(props) {
+  const [cookies] = useCookies(["currentUser"]);
   const { item, onDelete } = props;
   const { _id, name, price, description, category } = item;
   const navigate = useNavigate();
 
-  const handleCartAdd = (event) => {
-    event.preventDefault();
-    // localstorage
-    const stringProducts = localStorage.getItem("products");
-    // convert the string version of Products into array
-    let products = JSON.parse(stringProducts);
+  const handleAddToCart = (product) => {
+    if (isUserLoggedIn(cookies)) {
+      // trigger add to cart function
+      // event.preventDefault();
 
-    // if Products is not found, set it as empty array
-    if (!products) {
-      products = [];
-    }
+      // const handleCartAdd = (event) => {
+      // localstorage
+      const stringProducts = localStorage.getItem("cart");
+      // convert the string version of Products into array
+      let products = JSON.parse(stringProducts);
 
-    const existingProduct = products.find((product) => product._id === _id);
+      // if Products is not found, set it as empty array
+      if (!products) {
+        products = [];
+      }
 
-    if (existingProduct) {
-      existingProduct.quantity += 1;
-      toast.success("Product added successfully");
-      // existingProduct.quantity = existingProduct.quantity + 1;
+      const existingProduct = products.find((product) => product._id === _id);
+
+      if (existingProduct) {
+        existingProduct.quantity += 1;
+        toast.success(`${product.name} has been added to Cart`);
+        // existingProduct.quantity = existingProduct.quantity + 1;
+      } else {
+        toast.success("Product added successfully");
+        products.push({
+          _id: _id,
+          name: name,
+          price: price,
+          description: description,
+          category: category,
+          quantity: 1,
+        });
+      }
+
+      let convertedProducts = JSON.stringify(products);
+
+      localStorage.setItem("cart", convertedProducts);
+      // 3. redirect back to /addtocart
+      // navigate("/products/cart");
+      // };
     } else {
-      toast.success("Product added successfully");
-      products.push({
-        _id: _id,
-        name: name,
-        price: price,
-        description: description,
-        category: category,
-        quantity: 1,
-      });
+      // redirect user to login page if not logged in
+      navigate("/login");
+      toast.info("Please login first");
     }
-
-    let convertedProducts = JSON.stringify(products);
-
-    localStorage.setItem("products", convertedProducts);
-    // 3. redirect back to /addtocart
-    // navigate("/products/cart");
   };
 
   return (
     <Card sx={{ minWidth: 200 }}>
+      {item.image !== "" ? (
+        <CardMedia component="img" image={`${API_URL}/${item.image}`} />
+      ) : null}
       <CardContent>
         <Typography variant="h5" component="div">
           {name}
@@ -74,14 +92,14 @@ function GameCard(props) {
             sx={{ backgroundColor: "lightcyan" }}
           />
           <Chip
-            label={category}
+            label={category && category.name ? category.name : ""}
             size="small"
             color="error"
             variant="outlined"
             sx={{ backgroundColor: "lightpink" }}
           />
         </Box>
-        <Button variant="contained" fullWidth onClick={handleCartAdd}>
+        <Button variant="contained" fullWidth onClick={handleAddToCart}>
           Add To Cart
         </Button>
       </CardContent>
@@ -92,26 +110,30 @@ function GameCard(props) {
           padding: "10px 10",
         }}
       >
-        <Button
-          variant="contained"
-          size="small"
-          LinkComponent={Link}
-          to={`/products/${item._id}/edit`}
-          sx={{ borderRadius: 30, ml: 1 }}
-        >
-          Edit
-        </Button>
-        <Button
-          variant="contained"
-          size="small"
-          color="error"
-          sx={{ borderRadius: 30, mr: 1 }}
-          onClick={() => {
-            onDelete(_id);
-          }}
-        >
-          Delete
-        </Button>
+        {isAdmin(cookies) ? (
+          <>
+            <Button
+              variant="contained"
+              size="small"
+              LinkComponent={Link}
+              to={`/products/${item._id}/edit`}
+              sx={{ borderRadius: 30, ml: 1 }}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="contained"
+              size="small"
+              color="error"
+              sx={{ borderRadius: 30, mr: 1 }}
+              onClick={() => {
+                onDelete(_id);
+              }}
+            >
+              Delete
+            </Button>
+          </>
+        ) : null}
       </CardActions>
     </Card>
   );

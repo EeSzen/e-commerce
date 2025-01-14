@@ -1,13 +1,15 @@
-import { Button, Container, Paper } from "@mui/material";
+import { Button, Container, Paper, Typography } from "@mui/material";
 import { authSignup, validateEmail } from "../../utility/api";
 import { useState } from "react";
 import Header from "../../components/Header";
 import TextField from "@mui/material/TextField";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
 
 function Signup() {
   const navigate = useNavigate();
+  const [cookies, setCookie] = useCookies(["currentUser"]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,15 +24,18 @@ function Signup() {
 
     if (confirm !== password) {
       return toast.error("Please check your password");
-    } 
+    }
 
     //trigger the add new product API
     const newUser = await authSignup(name, email, password, confirm);
+    setCookie("currentUser", newUser, {
+      maxAge: 60 * 60 * 24 * 30,
+    });
 
     // check if the newUser exist or not
     if (!newUser) {
       return toast.error("Email or Password is incorrect");
-    }else if (!validateEmail) {
+    } else if (!validateEmail) {
       return toast.error("Email already exists");
     }
 
@@ -47,6 +52,9 @@ function Signup() {
       <Header label="Create a New Account" />
       <Container>
         <Paper sx={{ p: 3, pt: 5 }}>
+          <Typography variant="h4" align="center" mb={4}>
+            Signup
+          </Typography>
           <TextField
             fullWidth
             label="Name"

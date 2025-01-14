@@ -8,16 +8,25 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { toast } from "sonner";
+import { useCookies } from "react-cookie";
+import {
+  getUserToken,
+  isAdmin,
+  getProducts,
+  getCategory,
+  deleteProducts,
+} from "../../utility/api";
 
 import Header from "../../components/Header";
 import GameCard from "../../components/Card";
 import Container from "@mui/material/Container";
 
-import { getProducts, getCategory, deleteProducts } from "../../utility/api";
 import { ArrowLeft, ArrowRight } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 function Home() {
+  const [cookies] = useCookies(["currentUser"]);
+  const token = getUserToken(cookies);
   const [page, setPage] = useState(1);
   const [categories, setCategories] = useState([]);
   const [list, setList] = useState([]);
@@ -46,12 +55,12 @@ function Home() {
     setPage(1);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id, token) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this product?"
     );
     if (confirmed) {
-      const deleted = await deleteProducts(id);
+      const deleted = await deleteProducts(id, token);
       if (deleted) {
         // get the latest products data from the API again
         const latestProducts = await getProducts(category, page);
@@ -79,21 +88,22 @@ function Home() {
           <Typography variant="h5" sx={{ fontWeight: "bold" }}>
             Products
           </Typography>
-          <Button
-            LinkComponent={Link}
-            to="/products/new"
-            variant="contained"
-            color="success"
-            size="sm"
-          >
-            Add New
-          </Button>
+          {isAdmin(cookies) ? (
+            <Button
+              LinkComponent={Link}
+              to="/products/new"
+              variant="contained"
+              color="success"
+            >
+              Add New
+            </Button>
+          ) : null}
         </div>
-        <div>
+        <>
           {/* /////////////////////////////// */}
           {/* <Dropdown onChange={handleChange} list={list} /> */}
           {/* /////////////////////////////// */}
-          <div>
+          <Box sx={{ marginBottom: "20px" }}>
             <FormControl variant="filled" style={{ minWidth: 220 }}>
               <InputLabel id="demo-simple-select-filled-label">
                 All Categories
@@ -108,21 +118,21 @@ function Home() {
                   <em>All</em>
                 </MenuItem>
                 {categories.map((item) => (
-                  <MenuItem value={item}>{item}</MenuItem>
+                  <MenuItem value={item._id}>{item.name}</MenuItem>
                 ))}
               </Select>
             </FormControl>
-          </div>
+          </Box>
           {/* /////////////////////////////// */}
-        </div>
+        </>
         <Box sx={{ flexGrow: 1 }}>
-          <Grid container spacing={2}>
+          <Grid container marginTop={1} >
             {list.length > 0 ? (
               list.map((item) => (
-                <Grid key={item._id} xs={12} md={6} lg={4}>
+                <Grid key={item._id} xs={12} md={6} lg={4} >
                   <GameCard
                     item={item}
-                    onDelete={() => handleDelete(item._id)}
+                    onDelete={() => handleDelete(item._id, token)}
                   />
                 </Grid>
               ))

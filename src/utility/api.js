@@ -26,14 +26,33 @@ export const getProduct = async (_id) => {
 };
 
 // add new product
-export const addNewProducts = async (name, description, price, category) => {
+export const addNewProducts = async (
+  name,
+  description,
+  price,
+  category,
+  image,
+  token
+) => {
   try {
-    const response = await axios.post(API_URL + "/products", {
-      name: name,
-      description: description,
-      price: price,
-      category: category,
-    });
+    const response = await axios.post(
+      API_URL + "/products",
+      {
+        name: name,
+        description: description,
+        price: price,
+        category: category,
+        image: image,
+        token,
+      },
+      {
+        headers: {
+          //normalized headers
+          Authorization: "Bearer " + token,
+          // Bearer sdkjfzndsfkja12kmn2431?2...
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     toast.error(error.response.data);
@@ -41,27 +60,49 @@ export const addNewProducts = async (name, description, price, category) => {
 };
 
 // edit product
-export const editProducts = async (_id, name, description, price, category) => {
+export const editProducts = async (
+  _id,
+  name,
+  description,
+  price,
+  category,
+  image,
+  token
+) => {
   try {
-    const response = await axios.put(API_URL + "/products/" + _id, {
-      name: name,
-      description: description,
-      price: price,
-      category: category,
-    });
+    const response = await axios.put(
+      API_URL + "/products/" + _id,
+      {
+        name: name,
+        description: description,
+        price: price,
+        category: category,
+        image: image,
+        token,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     toast.error(error.response.data);
   }
 };
 
-// delete product
-export const deleteProducts = async (_id) => {
+// delete product (admin api)
+export const deleteProducts = async (_id, token) => {
   try {
-    const response = await axios.delete(API_URL + "/products/" + _id);
+    const response = await axios.delete(API_URL + `/products/${_id}`, {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
     return response.data;
   } catch (error) {
-    toast.error(error.response.data);
+    toast.error(error.response.data.error);
   }
 };
 
@@ -69,6 +110,16 @@ export const deleteProducts = async (_id) => {
 export const getCategory = async () => {
   try {
     const response = await axios.get(API_URL + "/categories");
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// get one category
+export const getOneCategory = async (_id) => {
+  try {
+    const response = await axios.get(API_URL + "/categories/" + _id);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -154,15 +205,25 @@ export const createOrder = async (
   customerName,
   customerEmail,
   products,
-  totalPrice
+  totalPrice,
+  token
 ) => {
   try {
-    const response = await axios.post(API_URL + "/orders", {
-      customerName,
-      customerEmail,
-      products,
-      totalPrice,
-    });
+    const response = await axios.post(
+      API_URL + "/orders",
+      {
+        customerName,
+        customerEmail,
+        products,
+        totalPrice,
+        token,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     toast.error(error.message);
@@ -171,9 +232,13 @@ export const createOrder = async (
 };
 
 // Get Orders
-export const getOrders = async () => {
+export const getOrders = async (token) => {
   try {
-    const response = await axios.get(API_URL + "/orders");
+    const response = await axios.get(API_URL + "/orders", {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
     console.log(response.data);
     return response.data;
   } catch (error) {
@@ -182,9 +247,13 @@ export const getOrders = async () => {
 };
 
 // get order by id
-export const getOrder = async (_id) => {
+export const getOrder = async (_id, token) => {
   try {
-    const response = await axios.get(API_URL + "/orders/" + _id);
+    const response = await axios.get(API_URL + "/orders/" + _id, {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
     return response.data;
   } catch (error) {
     toast.error(error.response.data);
@@ -192,9 +261,11 @@ export const getOrder = async (_id) => {
 };
 
 // Delete Order
-export const deleteOrder = async (_id) => {
+export const deleteOrder = async (_id, token) => {
   try {
-    const response = await axios.delete(API_URL + "/orders/" + _id);
+    const response = await axios.delete(API_URL + "/orders/" + _id, {
+      headers: { Authorization: "Bearer " + token },
+    });
     return response.data;
   } catch (error) {
     toast.error(error.response.data);
@@ -202,11 +273,19 @@ export const deleteOrder = async (_id) => {
 };
 
 // Update Order
-export const updateOrder = async (_id, status) => {
+export const updateOrder = async (_id, status, token) => {
   try {
-    const response = await axios.put(API_URL + "/orders/" + _id, {
-      status: status,
-    });
+    const response = await axios.put(
+      API_URL + "/orders/" + _id,
+      {
+        status: status,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     toast.error(error.response.data);
@@ -244,7 +323,7 @@ export const validateEmail = (email) => {
 
 // ======== Auth ======== //
 // login
-export const authLogin = async (email , password) => {
+export const authLogin = async (email, password) => {
   try {
     const response = await axios.post(API_URL + "/auth/login", {
       email,
@@ -268,4 +347,29 @@ export const authSignup = async (name, email, password) => {
   } catch (error) {
     toast.error(error.message);
   }
+};
+
+export const getCurrentUser = (cookies) => {
+  return cookies.currentUser ? cookies.currentUser : null;
+};
+
+export const isUserLoggedIn = (cookies) => {
+  return getCurrentUser(cookies) ? true : false;
+};
+
+export const isAdmin = (cookies) => {
+  const currentUser = getCurrentUser(cookies);
+  return currentUser && currentUser.role === "admin" ? true : false;
+};
+
+// function to access function
+export const getUserToken = (cookies) => {
+  const currentUser = getCurrentUser(cookies);
+  return currentUser && currentUser.token ? currentUser.token : "";
+};
+
+// function to get currentUser name via cookies
+export const getUserName = (cookies) => {
+  const currentUser = getCurrentUser(cookies);
+  return currentUser && currentUser.name ? currentUser.name : "";
 };

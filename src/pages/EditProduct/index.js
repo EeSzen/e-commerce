@@ -7,17 +7,34 @@ import { useParams } from "react-router-dom";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Header from "../../components/Header";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 import { toast } from "sonner";
-import { editProducts, getProduct } from "../../utility/api";
+import {
+  editProducts,
+  getProduct,
+  getUserToken,
+  getCategory,
+} from "../../utility/api";
+import { useCookies } from "react-cookie";
+import ButtonUpload from "../../components/ButtonUpload";
+import { uploadImage } from "../../utility/api_image";
+const API_URL = "http://localhost:5555";
 
 function EditProduct() {
   const { id } = useParams();
+  const [cookies] = useCookies(["currentUser"]);
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(0);
+  const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(true);
+  const [image, setImage] = useState("");
+  const token = getUserToken(cookies);
 
   useEffect(() => {
     getProduct(id).then((productData) => {
@@ -27,7 +44,23 @@ function EditProduct() {
       setPrice(productData.price);
       setCategory(productData.category);
     });
-  } , [id]);
+  }, [id]);
+
+  useEffect(() => {
+    getCategory().then((data) => {
+      setCategories(data);
+    });
+  }, []);
+
+  const handleChange = (event) => {
+    setCategory(event.target.value);
+  };
+
+  const handleImageUpload = async (files) => {
+    // trigger the upload API
+    const { image_url = "" } = await uploadImage(files[0]);
+    setImage(image_url);
+  };
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -41,7 +74,9 @@ function EditProduct() {
       name,
       description,
       price,
-      category
+      category,
+      image,
+      token
     );
 
     if (updatedProduct) {
@@ -88,7 +123,8 @@ function EditProduct() {
               onChange={(event) => setPrice(event.target.value)}
             />
           </Box>
-          <Box mb={2}>
+          {/* text box */}
+          {/* <Box mb={2}>
             <TextField
               label="Category"
               required
@@ -96,7 +132,59 @@ function EditProduct() {
               value={category}
               onChange={(event) => setCategory(event.target.value)}
             />
+          </Box> */}
+          {/* text box */}
+          <Box>
+            <FormControl variant="filled" style={{ minWidth: 220 }}>
+              <InputLabel id="demo-simple-select-filled-label">
+                All Categories
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-filled-label"
+                id="demo-simple-select-filled"
+                value={category}
+                onChange={handleChange}
+              >
+                <MenuItem value="">
+                  <em>All</em>
+                </MenuItem>
+                {categories.map((item) => (
+                  <MenuItem value={item._id}>{item.name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Box>
+
+          {image !== "" ? (
+            <>
+              <div>
+                <img
+                  src={`${API_URL}/${image}`}
+                  style={{
+                    width: "100%",
+                    maxWidth: "300px",
+                  }}
+                />
+              </div>
+              <Button
+                onClick={() => setImage("")}
+                variant="contained"
+                color="error"
+              >
+                Remove
+              </Button>
+            </>
+          ) : (
+            <ButtonUpload
+              onFileUpload={(files) => {
+                console.log(files);
+                // trigger the upload api
+                if (files && files[0]) {
+                  handleImageUpload(files);
+                }
+              }}
+            />
+          )}
           <Button
             variant="contained"
             color="primary"

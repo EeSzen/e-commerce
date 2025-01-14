@@ -9,27 +9,40 @@ import {
 import Grid from "@mui/material/Grid2";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import Header from "../../components/Header";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
-import { getCart } from "../../utility/api";
 import Table from "@mui/material/Table";
 import { toast } from "sonner";
-import { createOrder, validateEmail } from "../../utility/api";
+import {
+  createOrder,
+  validateEmail,
+  getUserToken,
+  getCurrentUser,
+  isUserLoggedIn,
+} from "../../utility/api";
+import { useCookies } from "react-cookie";
 
 function Checkout() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [cookies] = useCookies(["currentUser"]);
+  const token = getUserToken(cookies);
+  const currentUser = getCurrentUser(cookies);
+  const [name, setName] = useState(
+    currentUser && currentUser.name ? currentUser.name : ""
+  );
+  const [email, setEmail] = useState(
+    currentUser && currentUser.email ? currentUser.email : ""
+  );
   const [loading, setLoading] = useState(false);
 
   //   localstorage
-  const stringProducts = localStorage.getItem("products");
+  const stringProducts = localStorage.getItem("cart")
   // convert the string version of posts into array
   let products = JSON.parse(stringProducts);
 
@@ -47,6 +60,12 @@ function Checkout() {
   // const cart = getCart();
   // const totalPrice = getTotalCartPrice();
 
+  useEffect(() => {
+    if (!isUserLoggedIn(cookies)) {
+      navigate("/login");
+    }
+  }, [cookies, navigate]);
+
   const doCheckout = async () => {
     // 1. make sure the name and email fields are filled
     if (name === "" || email === "") {
@@ -58,7 +77,13 @@ function Checkout() {
       // show loader
       setLoading(true);
       // 2. trigger the createOrder function
-      const response = await createOrder(name, email, products, totalPrice);
+      const response = await createOrder(
+        name,
+        email,
+        products,
+        totalPrice,
+        token
+      );
       console.log(products);
       // 3. get the billplz url from response
       const billplz_url = response.billplz_url;
@@ -94,7 +119,9 @@ function Checkout() {
                 required
                 fullWidth
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                // disabled to prevent changing through inspect
+                // onChange={(event) => setEmail(event.target.value)}
+                disabled={true}
               />
             </Box>
 

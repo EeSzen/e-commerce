@@ -17,7 +17,7 @@ function AddToCart() {
   const navigate = useNavigate();
 
   //   localstorage
-  const stringProducts = localStorage.getItem("products");
+  const stringProducts = localStorage.getItem("cart");
   // convert the string version of posts into array
   let products = JSON.parse(stringProducts);
 
@@ -40,7 +40,7 @@ function AddToCart() {
     // 2. update the data back to the local storage using thelocalStorage.setItem()
     let convertedProducts = JSON.stringify(filteredProducts);
 
-    localStorage.setItem("products", convertedProducts);
+    localStorage.setItem("cart", convertedProducts);
     // 3. redirect back to /addtocart
     navigate("/products/cart");
   };

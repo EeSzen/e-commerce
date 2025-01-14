@@ -1,21 +1,19 @@
-import { Button, Container, Paper } from "@mui/material";
+import { Button, Container, Paper, Typography } from "@mui/material";
 import { authLogin } from "../../utility/api";
 import { useState } from "react";
 import Header from "../../components/Header";
 import TextField from "@mui/material/TextField";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
 
 function Login() {
   const navigate = useNavigate();
+  const [cookies, setCookie, removeCookie] = useCookies(["currentUser"]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  //   useEffect(() => {
-  //     authLogin().then((userData) => {
-  //       setEmail;
-  //     });
-  //   });
+  
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -25,6 +23,9 @@ function Login() {
     }
     // trigger the API
     const loggedUser = await authLogin(email, password);
+    setCookie("currentUser", loggedUser, {
+      maxAge: 60 * 60 * 24 * 30, // second * minutes * hours * days
+    });
 
     if (!loggedUser) {
       return toast.error("Email or Password is incorrect");
@@ -32,7 +33,7 @@ function Login() {
 
     if (loggedUser) {
       toast.success("You have logged in successfully!");
-      //   navigate("/");
+      navigate("/");
       console.log(loggedUser, "test login");
     }
   };
@@ -42,6 +43,9 @@ function Login() {
       <Header label="Login to Your Account" />
       <Container>
         <Paper sx={{ p: 3, pt: 5 }}>
+          <Typography variant="h4" align="center" mb={4}>
+            Login
+          </Typography>
           <TextField
             fullWidth
             label="Email"

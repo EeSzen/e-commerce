@@ -10,33 +10,40 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import { useCookies } from "react-cookie";
 
-import { deleteOrder, getOrders, updateOrder } from "../../utility/api";
+import {
+  deleteOrder,
+  getOrders,
+  updateOrder,
+  getUserToken,
+  isAdmin,
+} from "../../utility/api";
 
 function Orders() {
+  const [cookies] = useCookies(["currentUser"]);
+  const token = getUserToken(cookies);
   const [order, setOrder] = useState([]);
-  const [status, setStatus] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    getOrders().then((data) => {
+    getOrders(token).then((data) => {
       setOrder(data);
     });
   }, []);
 
-  const handleDeleteOrder = async (_id) => {
+  const handleDeleteOrder = async (_id, token) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this order?"
     );
     if (confirmed) {
-      const deleted = await deleteOrder(_id);
+      const deleted = await deleteOrder(_id, token);
       if (deleted) {
         // get the latest products data from the API again
-        const latestOrders = await getOrders();
+        const latestOrders = await getOrders(token);
         console.log(latestOrders);
         // update the products state with the latest data
         setOrder(latestOrders);
@@ -48,7 +55,7 @@ function Orders() {
     }
   };
 
-  const handleStatusChange = async (_id, status) => {
+  const handleStatusChange = async (_id, status, token) => {
     // try {
     //   const updatedOrder = await updateOrder(_id, newStatus);
     //   if (updatedOrder) {
@@ -63,13 +70,15 @@ function Orders() {
     //   }
     // } catch (error) {
     //   toast.error("Failed to update order status");
-    // }
-    const updatedOrder = await updateOrder(_id, status);
+    // }npm start
+    const updatedOrder = await updateOrder(_id, status, token);
     if (updatedOrder) {
       // fetch the updated orders from API
-      const updatedOrders = await getOrders();
+      const updatedOrders = await getOrders(token);
       setOrder(updatedOrders);
       toast.success("Order status has been updated");
+    } else {
+      toast.success("Ur Not Allowed");
     }
   };
 
@@ -124,66 +133,84 @@ function Orders() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {order.map((item) => (
-              <TableRow
-                key={item.customerName}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="products">
-                  <div>{item.customerName}</div>
-                  <div>({item.customerEmail})</div>
-                </TableCell>
-                <TableCell align="right">
-                  {item.products.map((a) => (
-                    <div key={a._id}>{a.name}</div>
-                  ))}
-                </TableCell>
-                <TableCell align="right">
-                  ${item.totalPrice.toFixed(2)}
-                </TableCell>
-                {/* ======= dropdown ====== */}
-                <TableCell align="right">
-                  <FormControl>
-                    {item.status === "pending" ? (
-                      <Select value={item.status} disabled={true}>
-                        <MenuItem value="pending">Pending</MenuItem>
-                      </Select>
-                    ) : (
-                      <Select
-                        value={item.status}
-                        onChange={(event) => {
-                          handleStatusChange(item._id, event.target.value);
-                        }}
-                      >
-                        <MenuItem value="paid">Paid</MenuItem>
-                        <MenuItem value="failed">Failed</MenuItem>
-                        <MenuItem value="completed">Completed</MenuItem>
-                      </Select>
-                    )}
-                  </FormControl>
-                </TableCell>
-                {/* ====================== */}
-                <TableCell align="right">{item.paid_at}</TableCell>
-                <TableCell align="right">
-                  {item.status === "failed" || item.status === "pending" ? (
-                    <Button
-                      variant="contained"
-                      color="error"
-                      // LinkComponent={Link}
-                      // to="/checkout"
-                      sx={{ textTransform: "none" }}
-                      onClick={() => {
-                        handleDeleteOrder(item._id);
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  ) : (
-                    ""
-                  )}
+            {order && order.length > 0 ? (
+              order.map((item) => (
+                <TableRow
+                  key={item.customerName}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="products">
+                    <div>{item.customerName}</div>
+                    <div>({item.customerEmail})</div>
+                  </TableCell>
+                  <TableCell align="right">
+                    {item.products.map((a) => (
+                      <div key={a._id}>{a.name}</div>
+                    ))}
+                  </TableCell>
+                  <TableCell align="right">
+                    ${item.totalPrice.toFixed(2)}
+                  </TableCell>
+                  {/* ======= dropdown ====== */}
+                  <TableCell align="right">
+                    <FormControl>
+                      {isAdmin(cookies) ? (
+                        item.status === "pending" ? (
+                          <Select value={item.status} disabled={true}>
+                            <MenuItem value="pending">Pending</MenuItem>
+                          </Select>
+                        ) : (
+                          <Select
+                            value={item.status}
+                            onChange={(event) => {
+                              handleStatusChange(
+                                item._id,
+                                event.target.value,
+                                token
+                              );
+                            }}
+                          >
+                            <MenuItem value="paid">Paid</MenuItem>
+                            <MenuItem value="failed">Failed</MenuItem>
+                            <MenuItem value="completed">Completed</MenuItem>
+                          </Select>
+                        )
+                      ) : (
+                        item.status
+                      )}
+                    </FormControl>
+                  </TableCell>
+                  {/* ====================== */}
+                  <TableCell align="right">{item.paid_at}</TableCell>
+                  <TableCell align="right">
+                    {isAdmin(cookies) ? (
+                      item.status === "failed" || item.status === "pending" ? (
+                        <Button
+                          variant="contained"
+                          color="error"
+                          // LinkComponent={Link}
+                          // to="/checkout"
+                          sx={{ textTransform: "none" }}
+                          onClick={() => {
+                            handleDeleteOrder(item._id, token);
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      ) : (
+                        ""
+                      )
+                    ) : null}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  No orders found!
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </TableContainer>
