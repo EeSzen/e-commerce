@@ -22,7 +22,7 @@ import {
 import { useCookies } from "react-cookie";
 import ButtonUpload from "../../components/ButtonUpload";
 import { uploadImage } from "../../utility/api_image";
-const API_URL = "http://localhost:5555";
+import { API_URL } from "../../constants";
 
 function EditProduct() {
   const { id } = useParams();

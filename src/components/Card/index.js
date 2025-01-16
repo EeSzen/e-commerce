@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { useCookies } from "react-cookie";
 import { isAdmin, isUserLoggedIn } from "../../utility/api";
 
-const API_URL = "http://localhost:5555";
+import { API_URL } from "../../constants";
 
 function GameCard(props) {
   const [cookies] = useCookies(["currentUser"]);

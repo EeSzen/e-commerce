@@ -62,7 +62,7 @@ function Categories() {
   // check if is admin or not
   useEffect(() => {
     if (!isAdmin(cookies)) {
-      navigate("/login");
+      navigate("/");
     }
   }, [cookies, navigate]);
 
@@ -78,9 +78,13 @@ function Categories() {
 
     // check if the newCategory exist or not
     if (newCategory) {
+      const newData = await getCategory();
+      setCategories(newData);
+      // clear the input field
+      setName("");
       // show success error
       toast.success("Category has been added successfully");
-      navigate("/");
+      // navigate("/");
     }
   };
 

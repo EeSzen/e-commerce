@@ -44,6 +44,7 @@ function Signup() {
       toast.success("Happy Shopping !");
       // navigate("/");
       console.log(newUser);
+      navigate("/");
     }
   };
 

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { toast } from "sonner";
 
-const API_URL = "http://localhost:5555";
+import { API_URL } from "../constants";
 
 // public API
 export const uploadImage = async (image) => {
